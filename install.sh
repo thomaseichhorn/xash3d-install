@@ -34,8 +34,8 @@ if [ "$(expr substr $machine 1 5)" == "Linux" ]; then
 		echo
 		echo "Installing packages: libfontconfig1-dev git"
 		if [ -n "$(command -v apt-get)" ]; then
-			sudo apt-get update || echo "Unable to update sources, are you root?"; exit
-			sudo apt-get install -y libfontconfig1-dev git || echo "Unable to install packages, are you root?"; exit
+			sudo apt-get update
+			sudo apt-get install -y libfontconfig1-dev git
 		elif [ -n "$(command -v yum)" ]; then
 			echo "ToDo!"
 		else
@@ -144,9 +144,9 @@ fi
 
 echo "#!/bin/bash" > $gamedir/run.sh
 echo "cd $gamedir" >> $gamedir/run.sh
-echo "LIBGL_FB=1" >> $gamedir/run.sh
-echo "LIBGL_BATCH=1" >> $gamedir/run.sh
-echo "LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$gamedir" >> $gamedir/run.sh
+echo "export LIBGL_FB=1" >> $gamedir/run.sh
+echo "export LIBGL_BATCH=1" >> $gamedir/run.sh
+echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$gamedir" >> $gamedir/run.sh
 echo "./xash3d -console -debug" >> $gamedir/run.sh
 
 echo "Done!"
