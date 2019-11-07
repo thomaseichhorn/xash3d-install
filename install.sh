@@ -32,12 +32,18 @@ if [ "$(expr substr $machine 1 5)" == "Linux" ]; then
 	if [ "$installpkg" = "y" ]; then
 
 		echo
-		echo "Installing packages: libfontconfig1-dev git"
+		echo "Installing packages..."
 		if [ -n "$(command -v apt-get)" ]; then
+			arch=debian
 			sudo apt-get update
-			sudo apt-get install -y libfontconfig1-dev git
+			sudo apt-get install -y libfontconfig1-dev git build-essential
 		elif [ -n "$(command -v yum)" ]; then
-			echo "ToDo!"
+			arch=rhel
+			sudo yum check-update
+			sudo yum install epel-release
+			sudo yum config-manager --set-enabled PowerTools
+			sudo yum update
+			sudo yum install urw-fonts git libgcc.i686 glibc-devel.i686 libstdc++-devel.i686 libxml2-devel.i686 fontconfig.i686 fontconfig-devel.i686 fontconfig-devel pkgconf.i686 freetype-devel.i686 SDL2-devel.i686 mesa-dri-drivers.i686
 		else
 			echo "Neither apt nor yum found, please install packages by hand!"
 		fi
@@ -62,7 +68,7 @@ if [ "$buildxash" = "y" ]; then
 
 	cd $sourcedir
 
-	# Arm needs SDL
+	# ARM needs SDL
 	if [ "$machine" = "LinuxArm" ]; then
 		wget http://www.libsdl.org/release/SDL2-2.0.10.tar.gz
 		tar xvf SDL2-2.0.10.tar.gz
@@ -70,7 +76,7 @@ if [ "$buildxash" = "y" ]; then
 		mkdir -p build
 		cd build
 		cmake ..
-		make
+		make -j$(nproc)
 		sudo make install
 	fi
 
@@ -95,7 +101,7 @@ if [ "$buildxash" = "y" ]; then
 		cmake -DHL_SDK_DIR=../hlsdk -DXASH_SDL=yes -DXASH_VGUI=yes -DCMAKE_C_FLAGS="-m32" -DCMAKE_CXX_FLAGS="-m32" -DCMAKE_EXE_LINKER_FLAGS="-m32" ..
 	fi
 
-	make
+	make -j$(nproc)
 
 	cp engine/libxash.so $gamedir
 	cp game_launch/xash3d $gamedir
@@ -119,7 +125,7 @@ if [ "$buildhlsdk" = "y" ]; then
 	mkdir -p build
 	cd build
 	cmake ..
-	make
+	make -j$(nproc)
 	cp cl_dll/client.so $gamedir
 	cp dlls/hl.so $gamedir
 fi
@@ -137,7 +143,7 @@ if [ "$buildbot" = "y" ]; then
 	fi
 	git clone https://github.com/thomaseichhorn/Parabot.git $botdir
 	cd $botdir/dlls
-	make
+	make -j$(nproc)
 	cp parabot.so ../addons/parabot/dlls/.
 	cp -R ../addons/ $addondir/.
 fi
