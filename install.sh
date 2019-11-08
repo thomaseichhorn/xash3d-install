@@ -23,6 +23,7 @@ else
 	echo "Can't get machine identity, exiting!"
 	exit
 fi
+echo
 echo "Running $machine"
 
 # Linux: install packages
@@ -34,17 +35,18 @@ if [ "$(expr substr $machine 1 5)" == "Linux" ]; then
 		echo
 		echo "Installing packages..."
 		if [ -n "$(command -v apt-get)" ]; then
-			arch=debian
+			arch=Debian
 			sudo apt-get update
-			sudo apt-get install -y libfontconfig1-dev git build-essential
+			sudo apt-get install libfontconfig1-dev git build-essential gcc-multilib g++-multilib cmake libsdl2-dev:i386 libfontconfig-dev:i386 libfreetype6-dev:i386
 		elif [ -n "$(command -v yum)" ]; then
-			arch=rhel
+			arch=RHEL
 			sudo yum check-update
 			sudo yum install epel-release
 			sudo yum config-manager --set-enabled PowerTools
 			sudo yum update
 			sudo yum install urw-fonts git libgcc.i686 glibc-devel.i686 libstdc++-devel.i686 libxml2-devel.i686 fontconfig.i686 fontconfig-devel.i686 fontconfig-devel pkgconf.i686 freetype-devel.i686 SDL2-devel.i686 mesa-dri-drivers.i686
 		else
+			echo
 			echo "Neither apt nor yum found, please install packages by hand!"
 		fi
 	fi
@@ -145,7 +147,10 @@ if [ "$buildbot" = "y" ]; then
 	cd $botdir/dlls
 	make -j$(nproc)
 	cp parabot.so ../addons/parabot/dlls/.
-	cp -R ../addons/ $addondir/.
+	cp -R ../addons/ $addondir/dmc/.
+	cp -R ../addons/ $addondir/gearbox/.
+	cp -R ../addons/ $addondir/tfc/.
+	cp -R ../addons/ $addondir/valve/.
 fi
 
 echo "#!/bin/bash" > $gamedir/run.sh
@@ -155,4 +160,5 @@ echo "export LIBGL_BATCH=1" >> $gamedir/run.sh
 echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$gamedir" >> $gamedir/run.sh
 echo "./xash3d -console -debug" >> $gamedir/run.sh
 
+echo
 echo "Done!"
