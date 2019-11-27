@@ -113,7 +113,7 @@ if [ "$buildxash" = "y" ]; then
 fi
 
 echo 
-read -p 'Build HLsdk? ' buildhlsdk
+read -p 'Build HL SDK? ' buildhlsdk
 
 if [ "$buildhlsdk" = "y" ]; then
 
@@ -173,6 +173,28 @@ if [ "$buildhlsdk" = "y" ]; then
 fi
 
 echo 
+read -p 'Build CS Client? ' buildcs
+
+if [ "$buildcs" = "y" ]; then
+
+	cd $sourcedir
+	csdir=$sourcedir/cs16-client
+	# If the source already exists, delete
+	if [ -d "$botdir" ]; then
+		rm -Rf $botdir
+	fi
+	git clone https://github.com/thomaseichhorn/cs16-client.git $csdir
+	cd $csdir/cl_dll
+	mkdir build
+	cd build
+	cmake ..
+	make -j$(nproc)
+	cp libclient.so $addondir/cstrike/cl_dlls/client.so
+
+
+fi
+
+echo 
 read -p 'Build Parabot? ' buildbot
 
 if [ "$buildbot" = "y" ]; then
@@ -192,9 +214,12 @@ if [ "$buildbot" = "y" ]; then
 	cp -R ../addons/ $addondir/valve/.
 
 	# Replace liblist.gam entries
-	sed -i 's/gamedll_linux "dlls\/dmc.so"/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/g' $addondir/dmc/liblist.gam
-	sed -i 's/gamedll_linux "dlls\/opfor.so"/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/g' $addondir/gearbox/liblist.gam
-	sed -i 's/gamedll_linux "dlls\/hl.so"/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/g' $addondir/valve/liblist.gam
+	sed -i 's/gamedll_linux "dlls\/dmc.so"/\/\/gamedll_linux "dlls\/dmc.so""/g' $addondir/dmc/liblist.gam
+	sed -i 's/gamedll_linux "dlls\/opfor.so"/\/\/gamedll_linux "dlls\/opfor.so"/g' $addondir/gearbox/liblist.gam
+	sed -i 's/gamedll_linux "dlls\/hl.so"/\/\/gamedll_linux "dlls\/hl.so"/g' $addondir/valve/liblist.gam
+	echo "gamedll_linux "addons/parabot/dlls/parabot.so"" >> $addondir/dmc/liblist.gam
+	echo "gamedll_linux "addons/parabot/dlls/parabot.so"" >> $addondir/gearbox/liblist.gam
+	echo "gamedll_linux "addons/parabot/dlls/parabot.so"" >> $addondir/valve/liblist.gam
 fi
 
 echo "#!/bin/bash" > $gamedir/run.sh
