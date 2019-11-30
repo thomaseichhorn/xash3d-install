@@ -39,9 +39,7 @@ if [ "$(expr substr $machine 1 5)" == "Linux" ]; then
 			sudo apt-get update
 			if [ "$machine" = "LinuxArm" ]; then
 				sudo apt-get install libfontconfig1-dev git build-essential cmake
-			elif [ "$machine" = "Linux32" ]; then
-				sudo apt-get install libfontconfig1-dev git build-essential cmake libfreetype6-dev:i386 gcc-multilib g++-multilib libsdl2-dev:i386 libfontconfig-dev:i386
-			elif [ "$machine" = "Linux64" ]; then
+			elif [ "$machine" = "Linux32" ] || [ "$machine" = "Linux64" ]; then
 				sudo apt-get install libfontconfig1-dev git build-essential cmake libfreetype6-dev:i386 gcc-multilib g++-multilib libsdl2-dev:i386 libfontconfig-dev:i386
 			fi
 						
