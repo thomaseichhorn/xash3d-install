@@ -17,7 +17,7 @@ elif [ "$(uname -sm)" == "Linux x86_64" ]; then
 	machine=Linux64
 elif [ "$(uname -sm)" == "Linux i686" ]; then
 	machine=Linux32
-elif [ "$(uname -sm)" == "Linux arm" ]; then
+elif [ "$(uname -sm)" == "Linux armv7l" ]; then
 	machine=LinuxArm
 else
 	echo "Can't get machine identity, exiting!"
@@ -37,7 +37,14 @@ if [ "$(expr substr $machine 1 5)" == "Linux" ]; then
 		if [ -n "$(command -v apt-get)" ]; then
 			arch=Debian
 			sudo apt-get update
-			sudo apt-get install libfontconfig1-dev git build-essential gcc-multilib g++-multilib cmake libsdl2-dev:i386 libfontconfig-dev:i386 libfreetype6-dev:i386
+			if [ "$machine" = "LinuxArm" ]; then
+				sudo apt-get install libfontconfig1-dev git build-essential cmake
+			elif [ "$machine" = "Linux32" ]; then
+				sudo apt-get install libfontconfig1-dev git build-essential cmake libfreetype6-dev:i386 gcc-multilib g++-multilib libsdl2-dev:i386 libfontconfig-dev:i386
+			elif [ "$machine" = "Linux64" ]; then
+				sudo apt-get install libfontconfig1-dev git build-essential cmake libfreetype6-dev:i386 gcc-multilib g++-multilib libsdl2-dev:i386 libfontconfig-dev:i386
+			fi
+						
 		elif [ -n "$(command -v yum)" ]; then
 			arch=RHEL
 			sudo yum check-update
