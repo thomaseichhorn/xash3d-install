@@ -1,3 +1,10 @@
+: # Detect if Windows batch, if so goto end section
+:<<"::CMDLITERAL"
+@ECHO OFF
+GOTO :SCRIPTWIN
+::CMDLITERAL
+
+
 #!/usr/bin/env bash
 
 # Check machine architecture
@@ -59,7 +66,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 fi
 
 # Find where we are
-basedir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+basedir=$PWD
 addondir=$basedir/addons
 gamedir=$basedir/HL
 mkdir -p $gamedir
@@ -243,3 +250,7 @@ echo "./xash3d -console -dev 5 -dedicated +exec server.cfg +maxplayers 32" >> $g
 
 echo
 echo "Done!"
+exit $?
+
+:SCRIPTWIN
+ECHO Welcome to %COMSPEC%
