@@ -1,23 +1,30 @@
+: # Detect if Windows batch, if so goto end section
+:<<"::CMDLITERAL"
+@ECHO OFF
+GOTO :SCRIPTWIN
+::CMDLITERAL
+
+
 #!/usr/bin/env bash
 
 # Check machine architecture
-if [ "$(uname)" == "Darwin" ]; then
+if [ "$(uname)" = "Darwin" ]; then
 	machine=OSX
 	echo "OSX is not supported!"
 	exit
-elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
+elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW32_NT" ]; then
 	machine=Win32
 	echo "Run install_windows.bat!"
 	exit
-elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
+elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW64_NT" ]; then
 	machine=Win64
 	echo "Run install_windows.bat!"
 	exit
-elif [ "$(uname -sm)" == "Linux x86_64" ]; then
+elif [ "$(uname -sm)" = "Linux x86_64" ]; then
 	machine=Linux64
-elif [ "$(uname -sm)" == "Linux i686" ]; then
+elif [ "$(uname -sm)" = "Linux i686" ]; then
 	machine=Linux32
-elif [ "$(uname -sm)" == "Linux arm" ]; then
+elif [ "$(uname -sm)" = "Linux armv7l" ]; then
 	machine=LinuxArm
 else
 	echo "Can't get machine identity, exiting!"
@@ -27,7 +34,7 @@ echo
 echo "Running $machine"
 
 # Linux: install packages
-if [ "$(expr substr $machine 1 5)" == "Linux" ]; then
+if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 	echo 
 	read -p 'Install packages? ' installpkg
 	if [ "$installpkg" = "y" ]; then
@@ -37,7 +44,12 @@ if [ "$(expr substr $machine 1 5)" == "Linux" ]; then
 		if [ -n "$(command -v apt-get)" ]; then
 			arch=Debian
 			sudo apt-get update
-			sudo apt-get install libfontconfig1-dev git build-essential gcc-multilib g++-multilib cmake libsdl2-dev:i386 libfontconfig-dev:i386 libfreetype6-dev:i386
+			if [ "$machine" = "LinuxArm" ]; then
+				sudo apt-get install libfontconfig1-dev git build-essential cmake
+			elif [ "$machine" = "Linux32" ] || [ "$machine" = "Linux64" ]; then
+				sudo apt-get install libfontconfig1-dev git build-essential cmake libfreetype6-dev:i386 gcc-multilib g++-multilib libsdl2-dev:i386 libfontconfig-dev:i386
+			fi
+						
 		elif [ -n "$(command -v yum)" ]; then
 			arch=RHEL
 			sudo yum check-update
@@ -54,7 +66,7 @@ if [ "$(expr substr $machine 1 5)" == "Linux" ]; then
 fi
 
 # Find where we are
-basedir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+basedir=$PWD
 addondir=$basedir/addons
 gamedir=$basedir/HL
 mkdir -p $gamedir
@@ -180,8 +192,8 @@ if [ "$buildcs" = "y" ]; then
 	cd $sourcedir
 	csdir=$sourcedir/cs16-client
 	# If the source already exists, delete
-	if [ -d "$botdir" ]; then
-		rm -Rf $botdir
+	if [ -d "$csdir" ]; then
+		rm -Rf $csdir
 	fi
 	git clone https://github.com/thomaseichhorn/cs16-client.git $csdir
 	cd $csdir/cl_dll
@@ -238,3 +250,7 @@ echo "./xash3d -console -dev 5 -dedicated +exec server.cfg +maxplayers 32" >> $g
 
 echo
 echo "Done!"
+exit $?
+
+:SCRIPTWIN
+ECHO Welcome to %COMSPEC%
