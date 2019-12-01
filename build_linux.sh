@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
 
 # Check machine architecture
-if [ "$(uname)" == "Darwin" ]; then
+if [ "$(uname)" = "Darwin" ]; then
 	machine=OSX
 	echo "OSX is not supported!"
 	exit
-elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
+elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW32_NT" ]; then
 	machine=Win32
 	echo "Run install_windows.bat!"
 	exit
-elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
+elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW64_NT" ]; then
 	machine=Win64
 	echo "Run install_windows.bat!"
 	exit
-elif [ "$(uname -sm)" == "Linux x86_64" ]; then
+elif [ "$(uname -sm)" = "Linux x86_64" ]; then
 	machine=Linux64
-elif [ "$(uname -sm)" == "Linux i686" ]; then
+elif [ "$(uname -sm)" = "Linux i686" ]; then
 	machine=Linux32
-elif [ "$(uname -sm)" == "Linux armv7l" ]; then
+elif [ "$(uname -sm)" = "Linux armv7l" ]; then
 	machine=LinuxArm
 else
 	echo "Can't get machine identity, exiting!"
@@ -27,7 +27,7 @@ echo
 echo "Running $machine"
 
 # Linux: install packages
-if [ "$(expr substr $machine 1 5)" == "Linux" ]; then
+if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 	echo 
 	read -p 'Install packages? ' installpkg
 	if [ "$installpkg" = "y" ]; then
@@ -185,8 +185,8 @@ if [ "$buildcs" = "y" ]; then
 	cd $sourcedir
 	csdir=$sourcedir/cs16-client
 	# If the source already exists, delete
-	if [ -d "$botdir" ]; then
-		rm -Rf $botdir
+	if [ -d "$csdir" ]; then
+		rm -Rf $csdir
 	fi
 	git clone https://github.com/thomaseichhorn/cs16-client.git $csdir
 	cd $csdir/cl_dll
