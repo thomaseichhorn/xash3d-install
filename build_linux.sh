@@ -4,7 +4,6 @@
 GOTO :SCRIPTWIN
 ::CMDLITERAL
 
-
 #!/usr/bin/env bash
 
 # Check machine architecture
