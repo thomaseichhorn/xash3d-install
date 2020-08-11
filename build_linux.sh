@@ -138,6 +138,9 @@ if [ "$buildhlsdk" = "y" ]; then
 	git clone --recursive https://github.com/thomaseichhorn/hlsdk-xash3d.git $hlsdkdir
 	cd $hlsdkdir
 	git fetch origin
+	git remote add upstream https://github.com/FWGS/hlsdk-xash3d.git
+	git submodule init
+	git submodule update
 	mkdir -p build
 	cd build
 	cmake ..
@@ -150,6 +153,8 @@ if [ "$buildhlsdk" = "y" ]; then
 	# DMC
 	cd $hlsdkdir
 	git checkout --track origin/dmc
+	git submodule init
+	git submodule update
 	cd build
 	rm -rf *
 	cmake ..
@@ -160,6 +165,8 @@ if [ "$buildhlsdk" = "y" ]; then
 	# OpFor
 	cd $hlsdkdir
 	git checkout --track origin/opfor
+	git submodule init
+	git submodule update
 	cd build
 	rm -rf *
 	cmake ..
@@ -171,7 +178,7 @@ if [ "$buildhlsdk" = "y" ]; then
 	cd $hlsdkdir
 	git checkout --track origin/bshift
 	git submodule init
-	git submodule update 
+	git submodule update
 	cd build
 	rm -rf *
 	cmake ..
