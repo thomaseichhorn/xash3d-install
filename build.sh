@@ -23,7 +23,7 @@ elif [ "$(uname -sm)" = "Linux armv7l" ]; then
 	machine=LinuxArm
 else
 	echo "Can't get machine identity, exiting!"
-	#exit
+	exit
 fi
 echo
 echo "Running $machine"
@@ -296,6 +296,7 @@ if [ "$machine" = "Win32" ]; then
 		cp mainui/menu.dll "$gamedir"
 		cp SDL2/SDL2-2.0.7/i686-w64-mingw32/bin/SDL2.dll "$gamedir"
 		cp VGUI/vgui-dev-master/lib/win32_vc6/vgui.dll "$gamedir"
+		cp vgui_support_prebuilt/vgui_support_bin-master/vgui_support.dll "$gamedir"
 
 	fi
 
@@ -412,11 +413,13 @@ if [ "$machine" = "Win32" ]; then
 		echo "gamedll "addons\parabot\dlls\parabot.so"" >> "$addondir/valve/liblist.gam"
 	fi
 
-PAUSE
+	echo
+	echo "Done!"
+	PAUSE
 
 fi
 
-
-
+# Windows with no compiler and/or tools
 :SCRIPTWIN
-ECHO Welcome to %COMSPEC%
+ECHO Running %COMSPEC%! You need to install mingw64, cmake and git!
+PAUSE
