@@ -415,7 +415,6 @@ if [ "$machine" = "Win32" ]; then
 
 	echo
 	echo "Done!"
-	PAUSE
 
 fi
 
