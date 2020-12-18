@@ -218,11 +218,11 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		fi
 		git clone https://github.com/thomaseichhorn/Parabot.git $botdir
 		cd $botdir/dlls
-		if [[ make -j$(nproc) ]]; then
+		if [ "$(make -j$(nproc))" ]; then
 			# Replace liblist.gam entries
-			sed -i '' '13s/.*/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/' $addondir/dmc/liblist.gam
-			sed -i '' '11s/.*/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/' $addondir/gearbox/liblist.gam
-			sed -i '' '9s/.*/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/' $addondir/valve/liblist.gam
+			sed -i '13s/.*/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/' $addondir/dmc/liblist.gam
+			sed -i '11s/.*/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/' $addondir/gearbox/liblist.gam
+			sed -i '9s/.*/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/' $addondir/valve/liblist.gam
 			echo "Uncomment to revert Parabot:" >> $addondir/dmc/liblist.gam
 			echo "//gamedll_linux "dlls/dmc.so"" >> $addondir/dmc/liblist.gam
 			echo "Uncomment to revert Parabot:" >> $addondir/gearbox/liblist.gam
