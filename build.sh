@@ -223,12 +223,6 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 			sed -i '13s/.*/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/' $addondir/dmc/liblist.gam
 			sed -i '11s/.*/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/' $addondir/gearbox/liblist.gam
 			sed -i '9s/.*/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/' $addondir/valve/liblist.gam
-			echo "Uncomment to revert Parabot:" >> $addondir/dmc/liblist.gam
-			echo "//gamedll_linux "dlls/dmc.so"" >> $addondir/dmc/liblist.gam
-			echo "Uncomment to revert Parabot:" >> $addondir/gearbox/liblist.gam
-			echo "//gamedll_linux "dlls/opfor.so"" >> $addondir/gearbox/liblist.gam
-			echo "Uncomment to revert Parabot:" >> $addondir/valve/liblist.gam
-			echo "//gamedll_linux "dlls/hl.so"" >> $addondir/valve/liblist.gam
 			cp parabot.so ../addons/parabot/dlls/.
 			cp -R ../addons/ $addondir/dmc/.
 			cp -R ../addons/ $addondir/gearbox/.
