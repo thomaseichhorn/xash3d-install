@@ -220,12 +220,15 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		cd $botdir/dlls
 		if [[ make -j$(nproc) ]]; then
 			# Replace liblist.gam entries
-			sed -i 's/gamedll_linux "dlls\/dmc.so"/\/\/gamedll_linux "dlls\/dmc.so""/g' $addondir/dmc/liblist.gam
-			sed -i 's/gamedll_linux "dlls\/opfor.so"/\/\/gamedll_linux "dlls\/opfor.so"/g' $addondir/gearbox/liblist.gam
-			sed -i 's/gamedll_linux "dlls\/hl.so"/\/\/gamedll_linux "dlls\/hl.so"/g' $addondir/valve/liblist.gam
-			echo "gamedll_linux "addons/parabot/dlls/parabot.so"" >> $addondir/dmc/liblist.gam
-			echo "gamedll_linux "addons/parabot/dlls/parabot.so"" >> $addondir/gearbox/liblist.gam
-			echo "gamedll_linux "addons/parabot/dlls/parabot.so"" >> $addondir/valve/liblist.gam
+			sed -i '' '13s/.*/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/' $addondir/dmc/liblist.gam
+			sed -i '' '11s/.*/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/' $addondir/gearbox/liblist.gam
+			sed -i '' '9s/.*/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/' $addondir/valve/liblist.gam
+			echo "Uncomment to revert Parabot:" >> $addondir/dmc/liblist.gam
+			echo "//gamedll_linux "dlls/dmc.so"" >> $addondir/dmc/liblist.gam
+			echo "Uncomment to revert Parabot:" >> $addondir/gearbox/liblist.gam
+			echo "//gamedll_linux "dlls/opfor.so"" >> $addondir/gearbox/liblist.gam
+			echo "Uncomment to revert Parabot:" >> $addondir/valve/liblist.gam
+			echo "//gamedll_linux "dlls/hl.so"" >> $addondir/valve/liblist.gam
 			cp parabot.so ../addons/parabot/dlls/.
 			cp -R ../addons/ $addondir/dmc/.
 			cp -R ../addons/ $addondir/gearbox/.
@@ -251,7 +254,10 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 	echo "./xash3d -console -dev 5 -dedicated +exec server.cfg +maxplayers 32" >> $gamedir/server.sh
 
 	echo
-	echo "Done!"
+	echo "Finished build!"
+	echo
+	echo "Now copy your valve (optional: and bshift, cstrike, dmc, gearbox) folder to $gamedir."
+	echo "Then copy the contents of the folder $addondir to $gamedir, overwriting all files."
 	exit $?
 
 fi
