@@ -38,13 +38,12 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		echo "Installing packages..."
 		if [ -n "$(command -v apt-get)" ]; then
 			arch=Debian
-			sudo apt-get update
+			sudo apt update
 			if [ "$machine" = "LinuxArm" ]; then
-				sudo apt-get install libfontconfig1-dev git build-essential cmake
+				sudo apt install libfontconfig1-dev git build-essential cmake libsdl2-dev
 			elif [ "$machine" = "Linux32" ] || [ "$machine" = "Linux64" ]; then
-				sudo apt-get install libfontconfig1-dev git build-essential cmake libfreetype6-dev:i386 gcc-multilib g++-multilib libsdl2-dev:i386 libfontconfig-dev:i386
+				sudo apt install libfontconfig1-dev git build-essential cmake libfreetype6-dev:i386 gcc-multilib g++-multilib libsdl2-dev:i386 libfontconfig-dev:i386
 			fi
-						
 		elif [ -n "$(command -v yum)" ]; then
 			arch=RHEL
 			sudo yum check-update
@@ -61,11 +60,11 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 
 	# Find where we are
 	basedir=$PWD
-	addondir=$basedir/addons
 	gamedir=$basedir/HL
 	mkdir -p $gamedir
 	sourcedir=$basedir/sources
 	mkdir -p $sourcedir
+	addondir=$basedir/buildfiles
 	echo
 	echo "Installing to $gamedir"
 	echo "Sources will be downloaded to $sourcedir"
@@ -219,19 +218,22 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		fi
 		git clone https://github.com/thomaseichhorn/Parabot.git $botdir
 		cd $botdir/dlls
-		make -j$(nproc)
-		cp parabot.so ../addons/parabot/dlls/.
-		cp -R ../addons/ $addondir/dmc/.
-		cp -R ../addons/ $addondir/gearbox/.
-		cp -R ../addons/ $addondir/valve/.
-
-		# Replace liblist.gam entries
-		sed -i 's/gamedll_linux "dlls\/dmc.so"/\/\/gamedll_linux "dlls\/dmc.so""/g' $addondir/dmc/liblist.gam
-		sed -i 's/gamedll_linux "dlls\/opfor.so"/\/\/gamedll_linux "dlls\/opfor.so"/g' $addondir/gearbox/liblist.gam
-		sed -i 's/gamedll_linux "dlls\/hl.so"/\/\/gamedll_linux "dlls\/hl.so"/g' $addondir/valve/liblist.gam
-		echo "gamedll_linux "addons/parabot/dlls/parabot.so"" >> $addondir/dmc/liblist.gam
-		echo "gamedll_linux "addons/parabot/dlls/parabot.so"" >> $addondir/gearbox/liblist.gam
-		echo "gamedll_linux "addons/parabot/dlls/parabot.so"" >> $addondir/valve/liblist.gam
+		if [[ make -j$(nproc) ]]; then
+			# Replace liblist.gam entries
+			sed -i 's/gamedll_linux "dlls\/dmc.so"/\/\/gamedll_linux "dlls\/dmc.so""/g' $addondir/dmc/liblist.gam
+			sed -i 's/gamedll_linux "dlls\/opfor.so"/\/\/gamedll_linux "dlls\/opfor.so"/g' $addondir/gearbox/liblist.gam
+			sed -i 's/gamedll_linux "dlls\/hl.so"/\/\/gamedll_linux "dlls\/hl.so"/g' $addondir/valve/liblist.gam
+			echo "gamedll_linux "addons/parabot/dlls/parabot.so"" >> $addondir/dmc/liblist.gam
+			echo "gamedll_linux "addons/parabot/dlls/parabot.so"" >> $addondir/gearbox/liblist.gam
+			echo "gamedll_linux "addons/parabot/dlls/parabot.so"" >> $addondir/valve/liblist.gam
+			cp parabot.so ../addons/parabot/dlls/.
+			cp -R ../addons/ $addondir/dmc/.
+			cp -R ../addons/ $addondir/gearbox/.
+			cp -R ../addons/ $addondir/valve/.
+		fi
+		else
+			echo "Couldn't build Parabot!"
+		fi
 	fi
 
 	echo "#!/bin/bash" > $gamedir/run.sh
@@ -258,11 +260,11 @@ if [ "$machine" = "Win32" ]; then
 
 	# Find where we are
 	basedir="$PWD"
-	addondir="$basedir/addons"
 	gamedir="$basedir/HL"
 	mkdir -p "$gamedir"
 	sourcedir="$basedir/sources"
 	mkdir -p "$sourcedir"
+	addondir="$baseedir/buildfiles"
 	echo
 	echo "Installing to $gamedir"
 	echo "Sources will be downloaded to $sourcedir"
