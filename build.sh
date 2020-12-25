@@ -412,9 +412,9 @@ if [ "$machine" = "Win32" ]; then
 		cp -R ../addons/ $addondir/valve/.
 
 		# Replace liblist.gam entries
-		echo "gamedll "addons\parabot\dlls\parabot.so"" >> "$addondir/dmc/liblist.gam"
-		echo "gamedll "addons\parabot\dlls\parabot.so"" >> "$addondir/gearbox/liblist.gam"
-		echo "gamedll "addons\parabot\dlls\parabot.so"" >> "$addondir/valve/liblist.gam"
+		sed -i '12s/.*/gamedll "addons\\parabot\\dlls\\parabot.dll"/' $addondir/dmc/liblist.gam
+		sed -i '10s/.*/gamedll "addons\\parabot\\dlls\\parabot.dll"/' $addondir/gearbox/liblist.gam
+		sed -i '8s/.*/gamedll "addons\\parabot\\dlls\\parabot.dll"/' $addondir/valve/liblist.gam
 	fi
 
 	echo "#!/bin/bash" > $gamedir/run.sh
