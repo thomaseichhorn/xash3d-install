@@ -227,7 +227,6 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 			cp -R ../addons/ $addondir/dmc/.
 			cp -R ../addons/ $addondir/gearbox/.
 			cp -R ../addons/ $addondir/valve/.
-		fi
 		else
 			echo "Couldn't build Parabot!"
 		fi
@@ -258,13 +257,16 @@ fi
 
 if [ "$machine" = "Win32" ]; then
 
+	# Default environment:
+	export PATH="$PATH:/C/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin"
+
 	# Find where we are
 	basedir="$PWD"
 	gamedir="$basedir/HL"
 	mkdir -p "$gamedir"
 	sourcedir="$basedir/sources"
 	mkdir -p "$sourcedir"
-	addondir="$baseedir/buildfiles"
+	addondir="$basedir/buildfiles"
 	echo
 	echo "Installing to $gamedir"
 	echo "Sources will be downloaded to $sourcedir"
@@ -415,8 +417,26 @@ if [ "$machine" = "Win32" ]; then
 		echo "gamedll "addons\parabot\dlls\parabot.so"" >> "$addondir/valve/liblist.gam"
 	fi
 
+	echo "#!/bin/bash" > $gamedir/run.sh
+	echo "cd $gamedir" >> $gamedir/run.sh
+	echo "export LIBGL_FB=1" >> $gamedir/run.sh
+	echo "export LIBGL_BATCH=1" >> $gamedir/run.sh
+	echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$gamedir" >> $gamedir/run.sh
+	echo "./xash.exe -console -debug" >> $gamedir/run.sh
+
+	echo "#!/bin/bash" > $gamedir/server.sh
+	echo "cd $gamedir" >> $gamedir/server.sh
+	echo "export LIBGL_FB=1" >> $gamedir/server.sh
+	echo "export LIBGL_BATCH=1" >> $gamedir/server.sh
+	echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$gamedir" >> $gamedir/server.sh
+	echo "./xash.exe -console -dev 5 -dedicated +exec server.cfg +maxplayers 32" >> $gamedir/server.sh
+
 	echo
-	echo "Done!"
+	echo "Finished build!"
+	echo
+	echo "Now copy your valve (optional: and bshift, cstrike, dmc, gearbox) folder to $gamedir."
+	echo "Then copy the contents of the folder $addondir to $gamedir, overwriting all files."
+	exit $?
 
 fi
 
