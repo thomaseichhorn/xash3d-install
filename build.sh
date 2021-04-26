@@ -19,7 +19,7 @@ elif [ "$(uname -sm)" = "Linux x86_64" ]; then
 	machine=Linux64
 elif [ "$(uname -sm)" = "Linux i686" ]; then
 	machine=Linux32
-elif [ "$(uname -sm)" = "Linux armv7l" ]; then
+elif [ "$(uname -sm)" = "Linux armv6l" ] || [ "$(uname -sm)" = "Linux armv7l" ]; then
 	machine=LinuxArm
 else
 	echo "Can't get machine identity, exiting!"
@@ -30,9 +30,9 @@ echo "Running $machine"
 
 # Linux: install packages and set paths
 if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
-	echo 
-	read -p 'Install packages? ' installpkg
-	if [ "$installpkg" = "y" ]; then
+	echo
+	read -p 'Install packages? [y/N] ' installpkg
+	if [ "$installpkg" = "y" ] || [ "$installpkg" = "Y" ]; then
 
 		echo
 		echo "Installing packages..."
@@ -69,10 +69,10 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 	echo "Installing to $gamedir"
 	echo "Sources will be downloaded to $sourcedir"
 
-	echo 
-	read -p 'Build Xash3D? ' buildxash
+	echo
+	read -p 'Build Xash3D? [y/N] ' buildxash
 
-	if [ "$buildxash" = "y" ]; then
+	if [ "$buildxash" = "y" ] || [ "$buildxash" = "Y" ]; then
 
 		cd $sourcedir
 
@@ -117,10 +117,10 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 
 	fi
 
-	echo 
-	read -p 'Build HL SDK? ' buildhlsdk
+	echo
+	read -p 'Build HL SDK? [y/N] ' buildhlsdk
 
-	if [ "$buildhlsdk" = "y" ]; then
+	if [ "$buildhlsdk" = "y" ] || [ "$buildhlsdk" = "Y" ]; then
 
 		# First (default) valve
 		cd $sourcedir
@@ -184,10 +184,10 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 
 	fi
 
-	echo 
-	read -p 'Build CS Client? ' buildcs
+	echo
+	read -p 'Build CS Client? [y/N] ' buildcs
 
-	if [ "$buildcs" = "y" ]; then
+	if [ "$buildcs" = "y" ] || [ "$buildcs" = "Y" ]; then
 
 		cd $sourcedir
 		csdir=$sourcedir/cs16-client
@@ -205,10 +205,10 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 
 	fi
 
-	echo 
-	read -p 'Build Parabot? ' buildbot
+	echo
+	read -p 'Build Parabot? [y/N] ' buildbot
 
-	if [ "$buildbot" = "y" ]; then
+	if [ "$buildbot" = "y" ] || [ "$buildbot" = "Y" ]; then
 
 		cd $sourcedir
 		botdir=$sourcedir/Parabot
@@ -272,9 +272,9 @@ if [ "$machine" = "Win32" ]; then
 	echo "Sources will be downloaded to $sourcedir"
 
 	echo
-	read -p 'Build Xash3D? ' buildxash
+	read -p 'Build Xash3D? [y/N] ' buildxash
 
-	if [ "$buildxash" = "y" ]; then
+	if [ "$buildxash" = "y" ] || [ "$buildxash" = "Y" ]; then
 
 		cd "$sourcedir"
 
@@ -304,10 +304,10 @@ if [ "$machine" = "Win32" ]; then
 
 	fi
 
-	echo 
-	read -p 'Build HL SDK? ' buildhlsdk
+	echo
+	read -p 'Build HL SDK? [y/N] ' buildhlsdk
 
-	if [ "$buildhlsdk" = "y" ]; then
+	if [ "$buildhlsdk" = "y" ] || [ "$buildhlsdk" = "Y" ]; then
 
 		# First (default) valve
 		cd "$sourcedir"
@@ -371,10 +371,10 @@ if [ "$machine" = "Win32" ]; then
 
 	fi
 
-	echo 
-	read -p 'Build CS Client? ' buildcs
+	echo
+	read -p 'Build CS Client? [y/N] ' buildcs
 
-	if [ "$buildcs" = "y" ]; then
+	if [ "$buildcs" = "y" ] || [ "$buildcs" = "Y" ]; then
 
 		cd "$sourcedir"
 		csdir="$sourcedir/cs16-client"
@@ -392,10 +392,10 @@ if [ "$machine" = "Win32" ]; then
 
 	fi
 
-	echo 
-	read -p 'Build Parabot? ' buildbot
+	echo
+	read -p 'Build Parabot? [y/N] ' buildbot
 
-	if [ "$buildbot" = "y" ]; then
+	if [ "$buildbot" = "y" ] || [ "$buildbot" = "Y" ]; then
 
 		cd "$sourcedir"
 		botdir="$sourcedir/Parabot"
