@@ -48,9 +48,9 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 			arch=RHEL
 			sudo yum check-update
 			sudo yum install epel-release
-			sudo yum config-manager --set-enabled PowerTools
+			sudo yum config-manager --set-enabled powertools
 			sudo yum update
-			sudo yum install urw-fonts git libgcc.i686 glibc-devel.i686 libstdc++-devel.i686 libxml2-devel.i686 fontconfig.i686 fontconfig-devel.i686 fontconfig-devel pkgconf.i686 freetype-devel.i686 SDL2-devel.i686 mesa-dri-drivers.i686
+			sudo yum install cmake gcc-c++ freetype-devel urw-fonts git libgcc.{i686,x86_64} glibc-devel.{i686,x86_64} libstdc++-devel.{i686,x86_64} libxml2-devel.{i686,x86_64} fontconfig.{i686,x86_64} fontconfig-devel.{i686,x86_64} fontconfig-devel pkgconf.{i686,x86_64} freetype-devel.{i686,x86_64} SDL2-devel.{i686,x86_64} mesa-dri-drivers.{i686,x86_64}
 		else
 			echo
 			echo "Neither apt nor yum found, please install packages by hand!"
@@ -93,27 +93,41 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		if [ -d "$xash3ddir" ]; then
 			rm -Rf $xash3ddir
 		fi
-		git clone --recursive https://github.com/thomaseichhorn/xash3d.git $xash3ddir
-		cd $xash3ddir/engine
-		git clone https://github.com/thomaseichhorn/nanogl.git
-		cd ..
-		git clone https://github.com/thomaseichhorn/halflife.git hlsdk/
-		mkdir -p build
-		cd build
 
-		if [ "$machine" = "LinuxArm" ]; then
-			cmake -DHL_SDK_DIR=../hlsdk -DXASH_VGUI=no -DXASH_NANOGL=yes -DXASH_GLES=yes ..
-		elif [ "$machine" = "Linux32" ]; then
-			cmake -DHL_SDK_DIR=../hlsdk -DXASH_SDL=yes -DXASH_VGUI=yes ..
-		elif [ "$machine" = "Linux64" ]; then
-			cmake -DHL_SDK_DIR=../hlsdk -DXASH_SDL=yes -DXASH_VGUI=yes -DCMAKE_C_FLAGS="-m32" -DCMAKE_CXX_FLAGS="-m32" -DCMAKE_EXE_LINKER_FLAGS="-m32" ..
+		engineversion=new
+
+		# Engine version check
+		if [ "$engineversion" = "old" ]; then
+			git clone --recursive https://github.com/thomaseichhorn/xash3d.git $xash3ddir
+			cd $xash3ddir/engine
+			git clone https://github.com/thomaseichhorn/nanogl.git
+			cd ..
+			git clone https://github.com/thomaseichhorn/halflife.git hlsdk/
+			mkdir -p build
+			cd build
+
+			if [ "$machine" = "LinuxArm" ]; then
+				cmake -DHL_SDK_DIR=../hlsdk -DXASH_VGUI=no -DXASH_NANOGL=yes -DXASH_GLES=yes ..
+			elif [ "$machine" = "Linux32" ]; then
+				cmake -DHL_SDK_DIR=../hlsdk -DXASH_SDL=yes -DXASH_VGUI=yes ..
+			elif [ "$machine" = "Linux64" ]; then
+				cmake -DHL_SDK_DIR=../hlsdk -DXASH_SDL=yes -DXASH_VGUI=yes -DCMAKE_C_FLAGS="-m32" -DCMAKE_CXX_FLAGS="-m32" -DCMAKE_EXE_LINKER_FLAGS="-m32" ..
+			fi
+
+			make -j$(nproc)
+
+			cp engine/libxash.so $gamedir
+			cp game_launch/xash3d $gamedir
+			cp mainui/libxashmenu.so $gamedir
+
+		else
+
+			git clone --recursive https://github.com/thomaseichhorn/xash3d-fwgs.git $xash3ddir
+			cd $xash3ddir
+			./waf configure -T release --prefix=$gamedir
+			./waf build
+			./waf install
 		fi
-
-		make -j$(nproc)
-
-		cp engine/libxash.so $gamedir
-		cp game_launch/xash3d $gamedir
-		cp mainui/libxashmenu.so $gamedir
 
 	fi
 
@@ -166,7 +180,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		cmake ..
 		make -j$(nproc)
 		cp cl_dll/client.so $addondir/gearbox/cl_dlls/client.so
-		cp dlls/hl.so $addondir/gearbox/dlls/opfor.so
+		cp dlls/opfor.so $addondir/gearbox/dlls/opfor.so
 
 		# Bshift
 		cd $hlsdkdir
@@ -178,7 +192,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		cmake ..
 		make -j$(nproc)
 		cp cl_dll/client.so $addondir/bshift/cl_dlls/client.so
-		cp dlls/hl.so $addondir/bshift/dlls/bshift.so
+		cp dlls/bshift.so $addondir/bshift/dlls/bshift.so
 
 		git checkout master
 
@@ -353,7 +367,7 @@ if [ "$machine" = "Win32" ]; then
 		cmake .. -G "MinGW Makefiles" -DCMAKE_SH="CMAKE_SH-NOTFOUND"
 		mingw32-make -j$(nproc)
 		cp cl_dll/client.dll "$addondir/gearbox/cl_dlls/client.dll"
-		cp dlls/hl.dll "$addondir/gearbox/dlls/opfor.dll"
+		cp dlls/opfor.dll "$addondir/gearbox/dlls/opfor.dll"
 
 		# Bshift
 		cd "$hlsdkdir"
@@ -365,7 +379,7 @@ if [ "$machine" = "Win32" ]; then
 		cmake .. -G "MinGW Makefiles" -DCMAKE_SH="CMAKE_SH-NOTFOUND"
 		mingw32-make -j$(nproc)
 		cp cl_dll/client.dll "$addondir/bshift/cl_dlls/client.dll"
-		cp dlls/hl.dll "$addondir/bshift/dlls/bshift.dll"
+		cp dlls/bshift.dll "$addondir/bshift/dlls/bshift.dll"
 
 		git checkout master
 
