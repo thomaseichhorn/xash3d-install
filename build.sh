@@ -44,7 +44,6 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		echo
 		echo "Installing packages..."
 		if [ -n "$(command -v apt-get)" ]; then
-			arch=Debian
 			sudo apt update
 			if [ "$machine" = "LinuxArm" ]; then
 				sudo apt install libfontconfig1-dev git build-essential cmake libsdl2-dev
@@ -52,7 +51,6 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 				sudo apt install libfontconfig1-dev git build-essential cmake libfreetype6-dev:i386 gcc-multilib g++-multilib libsdl2-dev:i386 libfontconfig-dev:i386
 			fi
 		elif [ -n "$(command -v yum)" ]; then
-			arch=RHEL
 			sudo yum check-update
 			sudo yum install epel-release
 			sudo yum config-manager --set-enabled powertools
@@ -131,10 +129,10 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 
 			git clone --recursive https://github.com/thomaseichhorn/xash3d-fwgs.git $xash3ddir
 			cd $xash3ddir
-                        if [ "$machine" = "LinuxArm" ]; then
+                        if [ "$machine" = "LinuxArm" ] || [ "$machine" = "Linux32" ]; then
 				./waf configure -T release --prefix=$gamedir --enable-gles1 --disable-gl --disable-vgui
                         elif [ "$machine" = "Linux64" ]; then
-				./waf configure -T release
+				./waf configure -T release --prefix=$gamedir
 			fi
 			./waf build
 			./waf install
