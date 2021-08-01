@@ -13,14 +13,21 @@ if [ "$(uname)" = "Darwin" ]; then
 	exit
 elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW32_NT" ]; then
 	machine=Win32
+	ext=.dll
 elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW64_NT" ]; then
 	machine=Win64
+	ext=.dll
 elif [ "$(uname -sm)" = "Linux x86_64" ]; then
 	machine=Linux64
+	ext=.so
 elif [ "$(uname -sm)" = "Linux i686" ]; then
 	machine=Linux32
+	ext=.so
 elif [ "$(uname -sm)" = "Linux armv6l" ] || [ "$(uname -sm)" = "Linux armv7l" ]; then
+	# pi uses v6, even on pi2/3/4?
 	machine=LinuxArm
+	arch=_armv6hf
+	ext=.so
 else
 	echo "Can't get machine identity, exiting!"
 	exit
@@ -124,7 +131,11 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 
 			git clone --recursive https://github.com/thomaseichhorn/xash3d-fwgs.git $xash3ddir
 			cd $xash3ddir
-			./waf configure -T release --prefix=$gamedir
+                        if [ "$machine" = "LinuxArm" ]; then
+				./waf configure -T release --prefix=$gamedir --enable-gles1 --disable-gl --disable-vgui
+                        elif [ "$machine" = "Linux64" ]; then
+				./waf configure -T release
+			fi
 			./waf build
 			./waf install
 		fi
@@ -153,9 +164,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		cd build
 		cmake ..
 		make -j$(nproc)
-		cp cl_dll/client.so $gamedir
-		cp dlls/hl.so $gamedir
-		cp cl_dll/client.so $addondir/valve/cl_dlls/client.so
+		cp cl_dll/client.so $addondir/valve/cl_dlls/client$arch$ext
 		cp dlls/hl.so $addondir/valve/dlls/hl.so
 
 		# DMC
@@ -167,7 +176,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		rm -rf *
 		cmake ..
 		make -j$(nproc)
-		cp cl_dll/client.so $addondir/dmc/cl_dlls/client.so
+		cp cl_dll/client.so $addondir/dmc/cl_dlls/client$arch$ext
 		cp dlls/hl.so $addondir/dmc/dlls/dmc.so
 
 		# OpFor
@@ -179,7 +188,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		rm -rf *
 		cmake ..
 		make -j$(nproc)
-		cp cl_dll/client.so $addondir/gearbox/cl_dlls/client.so
+		cp cl_dll/client.so $addondir/gearbox/cl_dlls/client$arch$ext
 		cp dlls/opfor.so $addondir/gearbox/dlls/opfor.so
 
 		# Bshift
@@ -191,7 +200,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		rm -rf *
 		cmake ..
 		make -j$(nproc)
-		cp cl_dll/client.so $addondir/bshift/cl_dlls/client.so
+		cp cl_dll/client.so $addondir/bshift/cl_dlls/client$arch$ext
 		cp dlls/bshift.so $addondir/bshift/dlls/bshift.so
 
 		git checkout master
@@ -215,7 +224,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		cd build
 		cmake ..
 		make -j$(nproc)
-		cp libclient.so $addondir/cstrike/cl_dlls/client.so
+		cp libclient.so $addondir/cstrike/cl_dlls/client$arch$ext
 
 	fi
 
@@ -237,7 +246,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 			sed -i '13s/.*/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/' $addondir/dmc/liblist.gam
 			sed -i '11s/.*/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/' $addondir/gearbox/liblist.gam
 			sed -i '9s/.*/gamedll_linux "addons\/parabot\/dlls\/parabot.so"/' $addondir/valve/liblist.gam
-			cp parabot.so ../addons/parabot/dlls/.
+			cp parabot.so ../addons/parabot/dlls/parabot$arch$ext
 			cp -R ../addons/ $addondir/dmc/.
 			cp -R ../addons/ $addondir/gearbox/.
 			cp -R ../addons/ $addondir/valve/.
