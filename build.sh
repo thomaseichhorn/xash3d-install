@@ -55,7 +55,9 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 			sudo yum install epel-release
 			sudo yum config-manager --set-enabled powertools
 			sudo yum update
-			sudo yum install cmake gcc-c++ freetype-devel urw-fonts git libgcc.{i686,x86_64} glibc-devel.{i686,x86_64} libstdc++-devel.{i686,x86_64} libxml2-devel.{i686,x86_64} fontconfig.{i686,x86_64} fontconfig-devel.{i686,x86_64} fontconfig-devel pkgconf.{i686,x86_64} freetype-devel.{i686,x86_64} SDL2-devel.{i686,x86_64} mesa-dri-drivers.{i686,x86_64}
+			sudo yum install cmake gcc-c++ freetype-devel urw-fonts git python3 libgcc.{i686,x86_64} glibc-devel.{i686,x86_64} libstdc++-devel.{i686,x86_64} libxml2-devel.{i686,x86_64} fontconfig.{i686,x86_64} fontconfig-devel.{i686,x86_64} fontconfig-devel pkgconf.{i686,x86_64} freetype-devel.{i686,x86_64} SDL2-devel.{i686,x86_64} mesa-dri-drivers.{i686,x86_64}
+			# should query status first:
+			sudo alternatives --set python /usr/bin/python3
 		else
 			echo
 			echo "Neither apt nor yum found, please install packages by hand!"
@@ -125,6 +127,10 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 			cp game_launch/xash3d $gamedir
 			cp mainui/libxashmenu.so $gamedir
 
+			# no specific library endings:
+			arch=
+			ext=.so
+
 		else
 
 			git clone --recursive https://github.com/thomaseichhorn/xash3d-fwgs.git $xash3ddir
@@ -163,7 +169,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		cmake ..
 		make -j$(nproc)
 		cp cl_dll/client.so $addondir/valve/cl_dlls/client$arch$ext
-		cp dlls/hl.so $addondir/valve/dlls/hl.so
+		cp dlls/hl.so $addondir/valve/dlls/hl$arch$ext
 
 		# DMC
 		cd $hlsdkdir
@@ -175,7 +181,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		cmake ..
 		make -j$(nproc)
 		cp cl_dll/client.so $addondir/dmc/cl_dlls/client$arch$ext
-		cp dlls/hl.so $addondir/dmc/dlls/dmc.so
+		cp dlls/hl.so $addondir/dmc/dlls/dmc$arch$ext
 
 		# OpFor
 		cd $hlsdkdir
@@ -187,7 +193,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		cmake ..
 		make -j$(nproc)
 		cp cl_dll/client.so $addondir/gearbox/cl_dlls/client$arch$ext
-		cp dlls/opfor.so $addondir/gearbox/dlls/opfor.so
+		cp dlls/opfor.so $addondir/gearbox/dlls/opfor$arch$ext
 
 		# Bshift
 		cd $hlsdkdir
@@ -199,7 +205,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		cmake ..
 		make -j$(nproc)
 		cp cl_dll/client.so $addondir/bshift/cl_dlls/client$arch$ext
-		cp dlls/bshift.so $addondir/bshift/dlls/bshift.so
+		cp dlls/bshift.so $addondir/bshift/dlls/bshift$arch$ext
 
 		git checkout master
 
