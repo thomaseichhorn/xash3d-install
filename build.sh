@@ -85,9 +85,9 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 
 		# ARM needs SDL
 		if [ "$machine" = "LinuxArm" ]; then
-			wget http://www.libsdl.org/release/SDL2-2.0.10.tar.gz
-			tar xvf SDL2-2.0.10.tar.gz
-			cd SDL2-2.0.10
+			wget http://www.libsdl.org/release/SDL2-2.0.22.tar.gz
+			tar xvf SDL2-2.0.22.tar.gz
+			cd SDL2-2.0.22
 			mkdir -p build
 			cd build
 			cmake ..
@@ -101,7 +101,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 			rm -Rf $xash3ddir
 		fi
 
-		engineversion=new
+		engineversion=old
 
 		# Engine version check
 		if [ "$engineversion" = "old" ]; then
@@ -114,7 +114,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 			cd build
 
 			if [ "$machine" = "LinuxArm" ]; then
-				cmake -DHL_SDK_DIR=../hlsdk -DXASH_VGUI=no -DXASH_NANOGL=yes -DXASH_GLES=yes ..
+				cmake -DXASH_VGUI=no -DXASH_NANOGL=yes -DXASH_GLES=yes ..
 			elif [ "$machine" = "Linux32" ]; then
 				cmake -DHL_SDK_DIR=../hlsdk -DXASH_SDL=yes -DXASH_VGUI=yes ..
 			elif [ "$machine" = "Linux64" ]; then
