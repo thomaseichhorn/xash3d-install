@@ -48,6 +48,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 			if [ "$machine" = "LinuxArm" ]; then
 				sudo apt install libfontconfig1-dev git build-essential cmake libsdl2-dev
 			elif [ "$machine" = "Linux32" ] || [ "$machine" = "Linux64" ]; then
+				sudo dpkg --add-architecture i386
 				sudo apt install libfontconfig1-dev git build-essential cmake libfreetype6-dev:i386 gcc-multilib g++-multilib libsdl2-dev:i386 libfontconfig-dev:i386
 			fi
 		elif [ -n "$(command -v yum)" ]; then
@@ -101,7 +102,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 			rm -Rf $xash3ddir
 		fi
 
-		engineversion=old
+		engineversion=new
 
 		# Engine version check
 		if [ "$engineversion" = "old" ]; then
@@ -133,15 +134,18 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 
 		else
 
-			git clone --recursive https://github.com/thomaseichhorn/xash3d-fwgs.git $xash3ddir
+			#git clone --recursive https://github.com/thomaseichhorn/xash3d-fwgs.git $xash3ddir
+			git clone --recursive https://github.com/FWGS/xash3d-fwgs.git $xash3ddir
 			cd $xash3ddir
+			git remote add upstream https://github.com/FWGS/xash3d-fwgs.git
                         if [ "$machine" = "LinuxArm" ] || [ "$machine" = "Linux32" ]; then
-				./waf configure -T release --prefix=$gamedir --enable-gles1 --disable-gl --disable-vgui
+				./waf configure -T release	
+				# --enable-gles1 --disable-gl --disable-vgui
                         elif [ "$machine" = "Linux64" ]; then
-				./waf configure -T release --prefix=$gamedir
+				./waf configure -T release 
 			fi
 			./waf build
-			./waf install
+			./waf install --destdir=$gamedir
 		fi
 
 	fi
@@ -166,10 +170,10 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		git submodule update
 		mkdir -p build
 		cd build
-		cmake ..
-		make -j$(nproc)
-		cp cl_dll/client.so $addondir/valve/cl_dlls/client$arch$ext
-		cp dlls/hl.so $addondir/valve/dlls/hl$arch$ext
+		cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=cc -S ..
+		cmake --build .
+		cp cl_dll/client$arch$ext $addondir/valve/cl_dlls/client$arch$ext
+		cp dlls/hl$arch$ext $addondir/valve/dlls/hl$arch$ext
 
 		# DMC
 		cd $hlsdkdir
@@ -178,10 +182,10 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		git submodule update
 		cd build
 		rm -rf *
-		cmake ..
-		make -j$(nproc)
-		cp cl_dll/client.so $addondir/dmc/cl_dlls/client$arch$ext
-		cp dlls/hl.so $addondir/dmc/dlls/dmc$arch$ext
+		cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=cc -S ..
+		cmake --build .
+		cp cl_dll/client$arch$ext $addondir/dmc/cl_dlls/client$arch$ext
+		cp dlls/hl$arch$ext $addondir/dmc/dlls/dmc$arch$ext
 
 		# OpFor
 		cd $hlsdkdir
@@ -190,10 +194,10 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		git submodule update
 		cd build
 		rm -rf *
-		cmake ..
-		make -j$(nproc)
-		cp cl_dll/client.so $addondir/gearbox/cl_dlls/client$arch$ext
-		cp dlls/opfor.so $addondir/gearbox/dlls/opfor$arch$ext
+		cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=cc -S ..
+		cmake --build .
+		cp cl_dll/client$arch$ext $addondir/gearbox/cl_dlls/client$arch$ext
+		cp dlls/opfor$arch$ext $addondir/gearbox/dlls/opfor$arch$ext
 
 		# Bshift
 		cd $hlsdkdir
@@ -202,12 +206,16 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		git submodule update
 		cd build
 		rm -rf *
-		cmake ..
-		make -j$(nproc)
-		cp cl_dll/client.so $addondir/bshift/cl_dlls/client$arch$ext
-		cp dlls/bshift.so $addondir/bshift/dlls/bshift$arch$ext
+		cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=cc -S ..
+		cmake --build .
+		cp cl_dll/client$arch$ext $addondir/bshift/cl_dlls/client$arch$ext
+		cp dlls/bshift$arch$ext $addondir/bshift/dlls/bshift$arch$ext
 
 		git checkout master
+		
+		# Hack for vgui.so
+		cd $hlsdkdir
+		cp vgui_support/vgui-dev/lib/vgui.so $gamedir/.
 
 	fi
 
