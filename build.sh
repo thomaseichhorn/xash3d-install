@@ -76,6 +76,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 	echo
 	echo "Installing to $gamedir"
 	echo "Sources will be downloaded to $sourcedir"
+	echo "Build files will be written to $addondir"
 
 	echo
 	read -p 'Build Xash3D? [y/N] ' buildxash
@@ -96,13 +97,17 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 			sudo make install
 		fi
 
-		xash3ddir=$sourcedir/xash3d
+		xash3ddir=$sourcedir/xash3dold
+		xash3ddirnew=$sourcedir/xash3dnew
 		# If the source already exists, delete
 		if [ -d "$xash3ddir" ]; then
 			rm -Rf $xash3ddir
 		fi
+		if [ -d "$xash3ddirnew" ]; then
+			rm -Rf $xash3ddirnew
+		fi
 
-		engineversion=new
+		engineversion=old
 
 		# Engine version check
 		if [ "$engineversion" = "old" ]; then
@@ -134,9 +139,8 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 
 		else
 
-			#git clone --recursive https://github.com/thomaseichhorn/xash3d-fwgs.git $xash3ddir
-			git clone --recursive https://github.com/FWGS/xash3d-fwgs.git $xash3ddir
-			cd $xash3ddir
+			git clone --recursive https://github.com/FWGS/xash3d-fwgs.git $xash3ddirnew
+			cd $xash3ddirnew
 			git remote add upstream https://github.com/FWGS/xash3d-fwgs.git
                         if [ "$machine" = "LinuxArm" ] || [ "$machine" = "Linux32" ]; then
 				./waf configure -T release	
@@ -160,7 +164,7 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		hlsdkdir=$sourcedir/hlsdk-xash3d
 		# If the source already exists, delete
 		if [ -d "$hlsdkdir" ]; then
-			rm -Rf $hlsdkdir
+			rm -rf $hlsdkdir
 		fi
 		git clone --recursive https://github.com/thomaseichhorn/hlsdk-xash3d.git $hlsdkdir
 		cd $hlsdkdir
@@ -170,10 +174,12 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		git submodule update
 		mkdir -p build
 		cd build
-		cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=cc -S ..
-		cmake --build .
-		cp cl_dll/client$arch$ext $addondir/valve/cl_dlls/client$arch$ext
-		cp dlls/hl$arch$ext $addondir/valve/dlls/hl$arch$ext
+		rm -rf *
+		cd ..
+		cmake -DCMAKE_BUILD_TYPE=Release -B build -S .
+		cmake --build build
+		cp build/cl_dll/client$arch$ext $addondir/valve/cl_dlls/client$arch$ext
+		cp build/dlls/hl$arch$ext $addondir/valve/dlls/hl$arch$ext
 
 		# DMC
 		cd $hlsdkdir
@@ -182,10 +188,11 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		git submodule update
 		cd build
 		rm -rf *
-		cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=cc -S ..
-		cmake --build .
-		cp cl_dll/client$arch$ext $addondir/dmc/cl_dlls/client$arch$ext
-		cp dlls/hl$arch$ext $addondir/dmc/dlls/dmc$arch$ext
+		cd ..
+		cmake -DCMAKE_BUILD_TYPE=Release -B build -S .
+		cmake --build build
+		cp build/cl_dll/client$arch$ext $addondir/dmc/cl_dlls/client$arch$ext
+		cp build/dlls/dmc$arch$ext $addondir/dmc/dlls/dmc$arch$ext
 
 		# OpFor
 		cd $hlsdkdir
@@ -194,10 +201,11 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		git submodule update
 		cd build
 		rm -rf *
-		cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=cc -S ..
-		cmake --build .
-		cp cl_dll/client$arch$ext $addondir/gearbox/cl_dlls/client$arch$ext
-		cp dlls/opfor$arch$ext $addondir/gearbox/dlls/opfor$arch$ext
+		cd ..
+		cmake -DCMAKE_BUILD_TYPE=Release -B build -S .
+		cmake --build build
+		cp build/cl_dll/client$arch$ext $addondir/gearbox/cl_dlls/client$arch$ext
+		cp build/dlls/opfor$arch$ext $addondir/gearbox/dlls/opfor$arch$ext
 
 		# Bshift
 		cd $hlsdkdir
@@ -206,16 +214,17 @@ if [ "$(expr substr $machine 1 5)" = "Linux" ]; then
 		git submodule update
 		cd build
 		rm -rf *
-		cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=cc -S ..
-		cmake --build .
-		cp cl_dll/client$arch$ext $addondir/bshift/cl_dlls/client$arch$ext
-		cp dlls/bshift$arch$ext $addondir/bshift/dlls/bshift$arch$ext
+		cd ..
+		cmake -DCMAKE_BUILD_TYPE=Release -B build -S .
+		cmake --build build
+		cp build/cl_dll/client$arch$ext $addondir/bshift/cl_dlls/client$arch$ext
+		cp build/dlls/bshift$arch$ext $addondir/bshift/dlls/bshift$arch$ext
 
 		git checkout master
 		
 		# Hack for vgui.so
-		cd $hlsdkdir
-		cp vgui_support/vgui-dev/lib/vgui.so $gamedir/.
+		#cd $hlsdkdir
+		#cp vgui_support/vgui-dev/lib/vgui.so $gamedir/.
 
 	fi
 
